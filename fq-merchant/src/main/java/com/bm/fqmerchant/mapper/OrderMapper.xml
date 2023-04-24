@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bm.fqmerchant.mapper.OrderMapper">
+    <update id="updateByStatus">
+        UPDATE b_order b1
+        SET b1.status = 6
+        WHERE b1.order_number = #{orderNumber}
+    </update>
+
+    <update id="updateDvy">
+        UPDATE b_order b1
+        SET b1.dvy_flow_id = #{dvyFlowId},
+            b1.dvy_id      =#{dvyId},
+            b1.status      = 3
+        WHERE b1.order_number = #{orderNumber}
+    </update>
+
+    <update id="updateByStatusTwo">
+        UPDATE b_order b1
+        SET b1.status = 5
+        WHERE b1.order_number = #{orderNumber}
+    </update>
+
+    <select id="selectOrderList" resultType="com.bm.fqmerchant.model.vo.OrderListVO">
+        SELECT
+        b1.order_number orderNumber,
+        b1.actual_total actualTotal,
+        b1.`status` prodStatus,
+        b2.real_name userName,
+        b1.created_at createdAt,
+        (CASE WHEN b1.status = 1 THEN '待付款'
+        WHEN b1.status = 2 THEN '待发货'
+        WHEN b1.status = 3 THEN '待收货'
+        WHEN b1.status = 4  THEN '成功'
+        WHEN b1.status = 5  THEN '成功'
+        WHEN b1.status = 6 THEN '已取消'
+        END ) prodStatusDesc
+        FROM
+        b_order b1 LEFT JOIN b_user b2 ON b2.user_id = b1.user_id
+        <where>
+            <if test="orderNumber != null and orderNumber !=''">AND b1.order_number = #{orderNumber}</if>
+            <if test="prodStatus != null and prodStatus !=''">AND b1.status = #{prodStatus}</if>
+            <if test="a != null and a !='' and b != null and b !=''">AND b1.created_at BETWEEN #{a} AND #{b}</if>
+            <if test="userName != null and userName !=''">AND b2.real_name = #{userName}</if>
+            AND b1.shop_id = #{shopId}
+        </where>
+    </select>
+
+    <select id="selectInfo" resultType="com.bm.fqmerchant.model.dto.OrderInfoDTO">
+        SELECT b1.order_number                                                                             orderNumber,
+               (SELECT b2.mobile FROM b_user_addr_order b2 WHERE b2.addr_order_id = b1.addr_order_id)      phone,
+               (SELECT b21.receiver FROM b_user_addr_order b21 WHERE b21.addr_order_id = b1.addr_order_id) receiver,
+               (SELECT CONCAT(b22.province, b22.city, b22.area, b22.addr)FROM b_user_addr_order b22 WHERE b22.addr_order_id = b1.addr_order_id)address,
+               (SELECT b3.real_name FROM b_user b3 WHERE b3.user_id = b1.user_id)                   userName,
+               (SELECT b4.dvy_name FROM b_delivery b4 WHERE b4.dvy_id = b1.dvy_id)                         dvyName,
+               b1.`status`                                                                                 prodStatus,
+               b1.dvy_flow_id                                                                              dvyNumber,
+               b1.created_at                                                                               createdAt,
+               b1.actual_total                                                                             actualTotal
+        FROM b_order b1
+        WHERE b1.order_number = #{orderNumber}
+    </select>
+    <select id="selectOrderDetails" resultType="com.bm.fqmerchant.model.dto.SpecificationDTO">
+        SELECT b2.properties           properties,
+               b2.prod_name            prodName,
+               CONCAT(#{url}, b1.pic)  image,
+               b1.order_number         orderNumber,
+               b1.price                price,
+               b1.prod_count           prodCount,
+               b1.product_total_amount productTotalAmount
+        FROM b_order_item b1
+                 LEFT JOIN b_sku b2 ON b2.sku_id = b1.sku_id
+        WHERE b1.order_number = #{orderNumber}
+    </select>
+</mapper>

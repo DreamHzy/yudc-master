@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bm.fqmerchant.mapper.GoodsMapper">
+
+
+
+    <select id="goodListVOList" resultType="com.bm.fqmerchant.model.vo.GoodListVO">
+
+        SELECT
+        b.prod_id 'goodsCode',
+        CONCAT(#{url}, b.pic) 'pic',
+        b.prod_name 'goodsName',
+        b.`status`,
+        b.total_stocks,
+        IF
+        ( b.`status` = 1, '上架', '下架' ) 'statusMsg'
+
+        FROM
+        b_prod b
+        LEFT JOIN b_shop_detail bsd ON b.shop_id = bsd.shop_id
+        <where>
+            b.`status` !=-1
+            AND b.shop_id = #{shopId}
+            <if test="goodsCode != null and goodsCode !=''">AND b.prod_id LIKE CONCAT('%', #{goodsCode} ,'%') </if>
+            <if test="goodsName != null and goodsName !=''">AND  b.prod_name LIKE CONCAT('%', #{goodsName} ,'%')</if>
+            <if test="status != null and status !=''">AND b.`status` = #{status}</if>
+        </where>
+
+    </select>
+
+
+    <select id="skuList" resultType="com.bm.fqmerchant.model.vo.SkuDetailDTO">
+
+        SELECT
+            sku_id 'id',
+                properties,
+            price,
+            stocks,
+            CONCAT(#{url}, pic) 'pic',
+            `status`,
+            IF(`status`=1,'上架','下降') 'statusMsg'
+        FROM
+            b_sku
+        WHERE
+            is_delete = 0
+          AND prod_id=#{prodId}
+    </select>
+
+    <update id="updateByProId">
+
+        UPDATE b_sku
+        SET is_delete = 0
+        WHERE
+            prod_id =#{prodId}
+
+    </update>
+</mapper>

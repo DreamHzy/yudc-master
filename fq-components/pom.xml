@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.bm</groupId>
+    <artifactId>fq-components</artifactId>
+    <version>Final</version> <!-- pom版本号/项目总版本号， 每个子项目引入的版本号必须一致。  最外层的pom.xml版本号保持不变，始终为Final版本。 更新版本请更改isys.version属性  -->
+    <packaging>pom</packaging> <!-- 项目的最终打包类型/发布形式, 可选[jar, war, pom, maven-plugin]等 -->
+    <name>fq-components</name>
+    <description>中间件相关</description>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <parent>
+        <groupId>com.bm</groupId>
+        <artifactId>fqshop</artifactId>
+        <version>Final</version>
+    </parent>
+
+    <!-- 声明子项目 -->
+    <modules>
+<!--        <module>fq-components-mq</module>&lt;!&ndash; MQ消息服务 &ndash;&gt;-->
+        <module>fq-components-oss</module>
+    </modules>
+
+
+</project>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bm.fqservice.mapper.BUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bm.fqservice.model.BUser">
+        <id column="user_id" property="userId" />
+        <result column="nick_name" property="nickName" />
+        <result column="real_name" property="realName" />
+        <result column="user_mail" property="userMail" />
+        <result column="login_password" property="loginPassword" />
+        <result column="pay_password" property="payPassword" />
+        <result column="user_mobile" property="userMobile" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="user_regtime" property="userRegtime" />
+        <result column="user_regip" property="userRegip" />
+        <result column="user_lasttime" property="userLasttime" />
+        <result column="user_lastip" property="userLastip" />
+        <result column="user_memo" property="userMemo" />
+        <result column="sex" property="sex" />
+        <result column="birth_date" property="birthDate" />
+        <result column="pic" property="pic" />
+        <result column="state" property="state" />
+        <result column="score" property="score" />
+    </resultMap>
+
+</mapper>

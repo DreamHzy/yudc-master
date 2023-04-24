@@ -1,0 +1,20 @@
+
+server:
+  port: 9999 #设置端口
+
+spring:
+  redis:
+    database: 4    #1库：运营平台  #2库：商户系统 #3库：用户端
+
+#系统业务参数
+isys:
+    jwt-secret: ARNXp4MzjOOQqxtv #生成jwt的秘钥。 要求每个系统有单独的秘钥管理机制。
+
+# Swagger配置
+swagger:
+  host:
+  title: 用户端
+  description: 用户端接口文档
+  enabled: true
+  # 禁用swagger时的重定向地址
+  redirect-uri: /

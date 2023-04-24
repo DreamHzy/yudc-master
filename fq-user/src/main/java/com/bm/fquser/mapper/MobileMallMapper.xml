@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bm.fquser.mapper.MobileMallMapper">
+    <update id="update">
+        UPDATE b_user_addr b1
+        SET b1.common_addr = 0
+        WHERE b1.user_id = #{userId}
+    </update>
+    <update id="updateStatus">
+        UPDATE b_order b1
+        SET b1.status = 5
+        WHERE b1.order_number = #{orderNumber}
+    </update>
+    <update id="updateOrder">
+        UPDATE b_order b1
+        SET b1.status = 6
+        WHERE b1.order_number = #{orderNumber}
+    </update>
+    <update id="updateAddress">
+        UPDATE b_user_addr b1
+        SET b1.state = 0
+        WHERE b1.addr_id = #{addrId}
+    </update>
+
+    <select id="selectHome" resultType="com.bm.fquser.model.dto.HomeDTO">
+        SELECT
+        b1.prod_id prodId,
+        b1.prod_name prodName,
+        CONCAT(#{url},b1.pic) `pic`,
+        IFNULL(b1.sold_num ,0) soldNum,
+         ( SELECT MIN( b2.price ) FROM b_sku b2 WHERE b2.prod_id = b1.prod_id ) price
+        FROM b_prod b1
+        <where>
+            <if test="model !=null and model !=''">
+                AND b1.prod_name LIKE CONCAT('%',#{model},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAddress" resultType="com.bm.fquser.model.dto.AddressDTO">
+        SELECT b1.addr_id                                                               AS addrId,
+               b1.receiver                                                              AS receiver,
+               b1.mobile                                                                AS mobile,
+               b1.state                                                                 AS status,
+               b1.common_addr                                                           AS commonAddr,
+               IFNULL(CONCAT(b1.province, ',', b1.city, ',', b1.area, ',', b1.addr), 0) AS addr
+        FROM b_user_addr b1
+        WHERE b1.user_id = #{sysUserId}
+          AND b1.state = 1
+        ORDER BY b1.common_addr DESC
+    </select>
+
+    <select id="selectOrder" resultType="com.bm.fquser.model.dto.OrderDTO">
+        SELECT
+        b1.order_id orderId,
+        b1.status status,
+        b1.product_nums productNums,
+        b1.order_number orderNumber,
+        b1.total total
+        FROM b_order b1
+        WHERE b1.user_id = #{userId}
+        <if test="model!=null and model.size>0 ">AND b1.status IN
+            <foreach collection="model" index="index" item="item" open="(" separator="," close=")">#{item}</foreach>
+        </if>
+    </select>
+
+    <select id="selectOrderAndSku" resultType="com.bm.fquser.model.dto.OrderAndSkuDTO">
+        SELECT b1.prod_count          prodCount,
+               b2.prod_name           prodName,
+               b1.price               price,
+               CONCAT(#{url}, b3.pic) pic,
+               b2.properties          properties
+        FROM b_order_item b1
+                 LEFT JOIN b_sku b2 ON b2.sku_id = b1.sku_id
+                 LEFT JOIN b_prod b3 ON b3.prod_id = b2.prod_id
+        WHERE b1.order_number = #{orderNumber}
+    </select>
+
+    <select id="selectWait" resultType="com.bm.fquser.model.dto.WaitAddressDTO">
+        SELECT b1.dvy_flow_id                                 dvyFlowId,
+               b2.dvy_name                                    dvyName,
+               CONCAT(b4.province, b4.city, b4.area, b4.addr) addr,
+               b3.receiver                                    receiver,
+               b3.mobile                                      mobile
+        FROM b_order b1
+                 LEFT JOIN b_delivery b2 ON b2.dvy_id = b1.dvy_id
+                 LEFT JOIN b_user_addr b3 ON b3.user_id = b1.user_id
+                 LEFT JOIN b_user_addr_order b4 ON b4.addr_order_id = b1.addr_order_id
+        WHERE b1.order_number = #{orderNumber}
+          AND b3.common_addr = '1'
+    </select>
+</mapper>

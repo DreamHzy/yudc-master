@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bm.fquser.mapper.BasketMapper">
+
+    <select id="basketGoodsVOS" resultType="com.bm.fquser.model.vo.BasketGoodsVO">
+
+        SELECT b3.prod_id 'prodId', b3.sku_id,
+               b2.prod_name 'prdName', CONCAT(#{url}, b3.pic) `pic`,
+               b1.basket_count 'count', b3.price,
+               b3.properties
+        FROM b_basket b1
+                 LEFT JOIN b_prod b2 ON b2.prod_id = b1.prod_id
+                 LEFT JOIN b_sku b3 ON b3.sku_id = b1.sku_id
+        WHERE b1.user_id = #{userId}
+    </select>
+
+    <select id="getTotalPay" resultType="com.bm.fquser.model.vo.ShopCartAmountDto">
+
+        SELECT
+        SUM(b1.basket_count) 'count',
+        SUM(b1.basket_count*b2.price) 'finalMoney'
+        FROM
+        b_basket b1 LEFT JOIN b_sku b2 ON b1.sku_id = b2.sku_id
+        WHERE b1.sku_id IN
+        <foreach collection="skuIds" index="index" item="item" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+
+        and b1.user_id = #{userId}
+
+    </select>
+</mapper>
